@@ -9,6 +9,7 @@ module Development.IDE.Test
   , requireDiagnostic
   , diagnostic
   , expectDiagnostics
+  , expectDiagnostics_
   , expectNoMoreDiagnostics
   , canonicalizeUri
   ) where
@@ -48,11 +49,11 @@ requireDiagnostic actuals expected@(severity, cursor, expectedMsg, expectedTag) 
         && cursorPosition cursor == d ^. range . start
         && standardizeQuotes (T.toLower expectedMsg) `T.isInfixOf`
            standardizeQuotes (T.toLower $ d ^. message)
-        && hasTag expectedTag (_tags d)
+        && hasTag expectedTag (d ^. tags)
 
     hasTag :: Maybe DiagnosticTag -> Maybe (List DiagnosticTag) -> Bool
-    hasTag Nothing          _                  = True
-    hasTag (Just actualTag) Nothing            = False
+    hasTag Nothing  _       = True
+    hasTag (Just _) Nothing = False
     hasTag (Just actualTag) (Just (List tags)) = actualTag `elem` tags
 
 -- |wait for @timeout@ seconds and report an assertion failure
